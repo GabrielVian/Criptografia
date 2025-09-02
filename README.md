@@ -1,5 +1,15 @@
 # No repositório você vai encontrar duas maneiras de criptografar e decifrar dados. 
 
+## Criar a venv
+
+```bash
+# ~ python3 -m venv venv
+// linux/mac
+# ~ source venv/bin/activate
+// Windows (PowerShell)
+# ~ venv\Scripts\Activate.ps1
+```
+
 ## Simplificado (usando dois arquivos)
 > Existe um arquivo chamado texto.txt, ele pode ser modificado por você, mas o nome tem que ser mantido
 
