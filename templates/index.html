@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoFile - Criptografia de Arquivos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            font-size: 2rem;
+        }
+
+        .encrypt-card h2 .icon {
+            color: #4CAF50;
+        }
+
+        .decrypt-card h2 .icon {
+            color: #2196F3;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+            background: #f9f9f9;
+        }
+
+        .file-input:hover {
+            border-color: #667eea;
+            background: #f0f0f0;
+        }
+
+        .file-input input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-encrypt {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-encrypt:hover {
+            background: linear-gradient(45deg, #45a049, #3d8b40);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-decrypt {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .btn-decrypt:hover {
+            background: linear-gradient(45deg, #1976D2, #1565C0);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .key-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .download-btn {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .cleanup-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn-cleanup {
+            background: #dc3545;
+            color: white;
+            padding: 10px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-cleanup:hover {
+            background: #c82333;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 CryptoFile</h1>
+            <p>Criptografe e descriptografe seus arquivos com segurança</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Seção de Criptografia -->
+            <div class="card encrypt-card">
+                <h2><span class="icon">🔒</span>Criptografar Arquivo</h2>
+                <form id="encryptForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Selecione o arquivo para criptografar:</label>
+                        <div class="file-input-wrapper">
+                            <div class="file-input">
+                                <input type="file" id="encryptFile" name="file" required>
+                                <span id="encryptFileLabel">Clique aqui ou arraste um arquivo</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-encrypt">Criptografar</button>
+                </form>
+                
+                <div class="loading" id="encryptLoading">
+                    <div class="spinner"></div>
+                    <p>Criptografando arquivo...</p>
+                </div>
+                
+                <div class="result" id="encryptResult"></div>
+            </div>
+
+            <!-- Seção de Descriptografia -->
+            <div class="card decrypt-card">
+                <h2><span class="icon">🔓</span>Descriptografar Arquivo</h2>
+                <form id="decryptForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Selecione o arquivo criptografado:</label>
+                        <div class="file-input-wrapper">
+                            <div class="file-input">
+                                <input type="file" id="decryptFile" name="file" required>
+                                <span id="decryptFileLabel">Clique aqui ou arraste um arquivo .enc</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="decryptKey">Cole a chave de descriptografia:</label>
+                        <textarea id="decryptKey" name="key" class="text-input" rows="3" placeholder="Cole aqui a chave de criptografia..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-decrypt">Descriptografar</button>
+                </form>
+                
+                <div class="loading" id="decryptLoading">
+                    <div class="spinner"></div>
+                    <p>Descriptografando arquivo...</p>
+                </div>
+                
+                <div class="result" id="decryptResult"></div>
+            </div>
+        </div>
+
+        <div class="cleanup-section">
+            <button id="cleanupBtn" class="btn-cleanup">🗑️ Limpar Arquivos Temporários</button>
+        </div>
+    </div>
+
+    <script>
+        // Manipulação de arquivos
+        document.getElementById('encryptFile').addEventListener('change', function(e) {
+            const label = document.getElementById('encryptFileLabel');
+            if (e.target.files.length > 0) {
+                label.textContent = e.target.files[0].name;
+            } else {
+                label.textContent = 'Clique aqui ou arraste um arquivo';
+            }
+        });
+
+        document.getElementById('decryptFile').addEventListener('change', function(e) {
+            const label = document.getElementById('decryptFileLabel');
+            if (e.target.files.length > 0) {
+                label.textContent = e.target.files[0].name;
+            } else {
+                label.textContent = 'Clique aqui ou arraste um arquivo .enc';
+            }
+        });
+
+        // Form de criptografia
+        document.getElementById('encryptForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const loading = document.getElementById('encryptLoading');
+            const result = document.getElementById('encryptResult');
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            // Mostrar loading
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/encrypt', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.className = 'result success';
+                    result.innerHTML = `
+                        <h3>✅ Arquivo criptografado com sucesso!</h3>
+                        <p><strong>Arquivo original:</strong> ${data.original_filename}</p>
+                        <a href="/download/${data.filename}" class="download-btn">📥 Baixar Arquivo Criptografado</a>
+                        <div class="key-display">
+                            <strong>Chave de Criptografia (COPIE E GUARDE):</strong>
+                            <button class="copy-btn" onclick="copyKey('${data.key}')">Copiar</button>
+                            <br><br>
+                            <code id="keyText">${data.key}</code>
+                        </div>
+                        <p style="margin-top: 15px; color: #856404; background: #fff3cd; padding: 10px; border-radius: 5px;">
+                            ⚠️ <strong>IMPORTANTE:</strong> Copie e guarde esta chave em local seguro. Sem ela, não será possível descriptografar o arquivo!
+                        </p>
+                    `;
+                } else {
+                    result.className = 'result error';
+                    result.innerHTML = `<h3>❌ Erro:</h3><p>${data.error}</p>`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `<h3>❌ Erro:</h3><p>Falha na comunicação com o servidor: ${error.message}</p>`;
+            }
+            
+            // Esconder loading
+            loading.style.display = 'none';
+            result.style.display = 'block';
+            submitBtn.disabled = false;
+        });
+
+        // Form de descriptografia
+        document.getElementById('decryptForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const loading = document.getElementById('decryptLoading');
+            const result = document.getElementById('decryptResult');
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            // Mostrar loading
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/decrypt', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.className = 'result success';
+                    result.innerHTML = `
+                        <h3>✅ Arquivo descriptografado com sucesso!</h3>
+                        <p><strong>Arquivo recuperado:</strong> ${data.original_filename}</p>
+                        <a href="/download/${data.filename}" class="download-btn">📥 Baixar Arquivo Descriptografado</a>
+                    `;
+                } else {
+                    result.className = 'result error';
+                    result.innerHTML = `<h3>❌ Erro:</h3><p>${data.error}</p>`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `<h3>❌ Erro:</h3><p>Falha na comunicação com o servidor: ${error.message}</p>`;
+            }
+            
+            // Esconder loading
+            loading.style.display = 'none';
+            result.style.display = 'block';
+            submitBtn.disabled = false;
+        });
+
+        // Função para copiar chave
+        function copyKey(key) {
+            navigator.clipboard.writeText(key).then(function() {
+                alert('Chave copiada para a área de transferência!');
+            }, function(err) {
+                console.error('Erro ao copiar chave: ', err);
+                // Fallback para browsers mais antigos
+                const textArea = document.createElement('textarea');
+                textArea.value = key;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Chave copiada para a área de transferência!');
+            });
+        }
+
+        // Botão de limpeza
+        document.getElementById('cleanupBtn').addEventListener('click', async function() {
+            if (confirm('Tem certeza que deseja limpar todos os arquivos temporários?')) {
+                try {
+                    const response = await fetch('/cleanup');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert('✅ Arquivos temporários removidos com sucesso!');
+                        // Limpar resultados
+                        document.getElementById('encryptResult').style.display = 'none';
+                        document.getElementById('decryptResult').style.display = 'none';
+                    } else {
+                        alert('❌ Erro ao limpar arquivos: ' + data.error);
+                    }
+                } catch (error) {
+                    alert('❌ Erro na comunicação com o servidor: ' + error.message);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
