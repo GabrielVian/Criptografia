@@ -13,8 +13,6 @@
 ## Simplificado (usando dois arquivos)
 > Existe um arquivo chamado texto.txt, ele pode ser modificado por você, mas o nome tem que ser mantido
 
-- Crie uma venv (ambiente) nova para instalar as dependências encontradas no *requirements.txt*
-
 ```bash
 # ~ python Criptografa.py 
 b'hjasdfiouhqweiunfiwuehrihsfd'
